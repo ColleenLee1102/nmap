@@ -81,15 +81,35 @@ local function check_response(response)
   --print(response_string.body)
   --print(type(response_string.body))
   print("before sendpid!")
-  crete.sendpid()
-  crete.mconcolic(response.body,12)
-  if not(response.body) or response.status==500 then
-    return true
+  --zl3 for replay sendpid has to be commented out
+  --crete.sendpid()
+  --crete.mconcolic(response.body,12)
+  
+  --for zl3 replay test cases
+  --local test_table = crete.replaytest("/home/zheli/clean_crete/text-test-case/1.txt")
+  local test_table = crete.replaytest("/home/zheli/clean_crete/content_server_error.txt")
+  
+  for k, v in pairs(test_table) do
+     print(k, v)
+     response.body = v
+     if not(response.body) or response.status==500 then
+        return true
+     end
+     --if response.body:find("[Ss][Ee][Rr][Vv][Ee][Rr]%s*[Ee][Rr][Rr][Oo][Rr]") or response.body:find("[Ss][Qq][Ll]%s*[Ee][Rr][Rr][Oo][Rr]") then
+     if response.body:find("SERVER ERROR") then
+        print("hit")
+        --return true
+     end
   end
+  
+  --if not(response.body) or response.status==500 then
+    --return true
+  --end
   --if response.body:find("[Ss][Ee][Rr][Vv][Ee][Rr]%s*[Ee][Rr][Rr][Oo][Rr]") or response.body:find("[Ss][Qq][Ll]%s*[Ee][Rr][Rr][Oo][Rr]") then
-  if response.body:find("SERVER ERROR") then
-    return true
-  end
+  --if response.body:find("SERVER ERROR") then
+    --return true
+  --end
+  
   --zl3
   print("before exit!")
   crete.mexit(0)
