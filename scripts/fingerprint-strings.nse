@@ -4,6 +4,8 @@ local lpeg = require "lpeg"
 local U = require "lpeg-utility"
 local table = require "table"
 local tableaux = require "tableaux"
+--zl3
+local crete = require "crete"
 
 description = [[
 Prints the readable strings from service fingerprints of unknown services.
@@ -54,10 +56,30 @@ author = "Daniel Miller"
 categories = {"version"}
 
 portrule = function (host, port)
+  --zl3 debug
+  print("entered portrule")
   -- Run for any port that has a service fingerprint indicating an unknown service
   -- OK to run at any version intensity (e.g. not checking nmap.version_intensity)
   -- because no traffic is sent and lower intensity is more likely to not match.
+  
+  -- zl3 print debug info 
+  print("port number is ")
+  print(port.number)
+  print("port state is ")
+  print(port.state)
+  print(port.version.name)
+  print("service_fp is ")
+  print(port.version.service_fp)
+  
+  -- zl3 adding crete
+  print("before sendpid")
+  print(type(port.version.service_fp))
+  --crete.sendpid()
+  --crete.mconcolic(port.version.service_fp,74)
+  --zl3 done
+  
   return port.version and port.version.service_fp
+  --return port.version
 end
 
 -- Create a table if necessary and append to it
@@ -72,6 +94,9 @@ end
 
 -- Extract strings of length n or greater.
 local function strings (blob, n)
+  --zl3 print blob
+  print("zl3 print function strings blob:")
+  print(blob)
   local pat = lpeg.P {
     (lpeg.V "plain" + lpeg.V "skip")^1,
     -- Collect long-enough string of printable and space characters
@@ -85,11 +110,17 @@ local function strings (blob, n)
 end
 
 action = function(host, port)
+  print("enter action function")
   -- Get the table of probe responses
   local responses = U.parse_fp(port.version.service_fp)
   -- extract the probe names
   local probes = tableaux.keys(responses)
   -- If there were no probes (WEIRD!) we're done.
+  
+  --zl3 print probes
+  print("probes are ")
+  print(#probes)
+    
   if #probes <= 0 then
     return nil
   end
@@ -101,11 +132,25 @@ action = function(host, port)
   local invert = {}
   for i=1, #probes do
     -- Extract the strings from this probe
+    
+    --zl3 print response probes[i]
+    print("print response probes")
+    print(responses[probes[i]])
+    
     local plain = strings(responses[probes[i]], min)
     if plain then
       stdnse.debug1("%s:>>>%s<<<", probes[i], plain)
       -- rearrange some whitespace to look nice
-      plain = plain:gsub("^[\n ]*", "\n    "):gsub("[\n ]+$", "")
+      
+      --zl3 insert symbolic value here
+      --crete.sendpid()
+      print("plain len is changed")
+      local pattern = "^[\n ]*"
+      --crete.mconcolic(pattern,6)
+      --zl3 insert symbolic value here
+      
+      --plain = plain:gsub("^[\n ]*", "\n    "):gsub("[\n ]+$", "")
+      plain = plain:gsub(pattern, "\n    "):gsub("[\n ]+$", "")
       -- Gather all the probes that had this same set of strings.
       if plain ~= "" then
         invert[plain] = safe_append(invert[plain], probes[i])

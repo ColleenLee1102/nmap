@@ -81,7 +81,7 @@ local function check_response(response)
   --print(response_string.body)
   --print(type(response_string.body))
   print("before sendpid!")
-  crete.sendpid()
+  --crete.sendpid()
   crete.mconcolic(response.body,12)
   if not(response.body) or response.status==500 then
     return true
