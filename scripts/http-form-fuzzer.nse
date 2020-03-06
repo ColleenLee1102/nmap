@@ -62,6 +62,15 @@ local rand = require 'rand'
 --zl3
 local crete = require "crete"
 
+--zl3 lua cov
+local luacov = require "luacov.runner"
+--zl3 lua cov
+
+--zl3 start collect luacov data
+--luacov.init()
+print("after luacov init count ")
+--zl3 end
+
 -- generate a charset that will be used for fuzzing
 local function generate_charset(left_bound, right_bound, ...)
   local t = ... or {}
@@ -86,8 +95,8 @@ local function check_response(response)
   --crete.mconcolic(response.body,12)
   
   --for zl3 replay test cases
-  --local test_table = crete.replaytest("/home/zheli/clean_crete/text-test-case/1.txt")
-  local test_table = crete.replaytest("/home/zheli/clean_crete/content_server_error.txt")
+  local test_table = crete.replaytest("/home/zheli/clean_crete/text-test-case/1.txt")
+  --local test_table = crete.replaytest("/home/zheli/clean_crete/content_server_error.txt")
   
   for k, v in pairs(test_table) do
      print(k, v)
