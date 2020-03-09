@@ -67,7 +67,7 @@ local luacov = require "luacov.runner"
 --zl3 lua cov
 
 --zl3 start collect luacov data
---luacov.init()
+luacov.init()
 print("after luacov init count ")
 --zl3 end
 

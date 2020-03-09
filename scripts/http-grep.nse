@@ -5,6 +5,9 @@ local stdnse = require "stdnse"
 local table = require "table"
 local tableaux = require "tableaux"
 
+--zl3 lua cov
+local luacov = require "luacov.runner"
+--zl3 lua cov
 
 description = [[
 Spiders a website and attempts to match all pages and urls against a given
@@ -158,6 +161,10 @@ local function luhn(matched_ccno)
   for i=2, n:len(), 2 do
     local doubled = n:sub(i,i)*2
     doubled = string.gsub(doubled,'(%d)(%d)',function(a,b)return a+b end)
+    --zl3
+    doubled = string.gsub(doubled, '(.0)', "")
+    doubled = tonumber(doubled)
+    --zl3
     s2 = s2+doubled
   end
   local total = s1 + s2
@@ -209,6 +216,12 @@ end
 
 action = function(host, port)
   -- a list of popular patterns with their validators.
+  
+  --zl3 start collect luacov data
+  luacov.init()
+  print("after luacov init count ")
+  --zl3 end
+  
   local BUILT_IN_PATTERNS = {
   ['email'] = {'[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?'},
   ['phone'] = {'%f[%d]%d%d%d%-%d%d%d%d%f[^%d]','%f[%d%(]%(%d%d%d%)%s%d%d%d%-%d%d%d%f[^%d]','%f[%d%+]%+%-%d%d%d%-%d%d%d%-%d%d%d%d%f[^%d]','%d%d%d%-%d%d%d%-%d%d%d%d%f[^%d]'},
@@ -225,6 +238,9 @@ action = function(host, port)
   local break_on_match = stdnse.get_script_args(SCRIPT_NAME .. ".breakonmatch")
   local builtins = stdnse.get_script_args(SCRIPT_NAME .. ".builtins")
   local to_be_searched = {}
+  
+  --zl3 builtins
+  builtins = {"discover"}
 
   local crawler = httpspider.Crawler:new(host, port, nil, { scriptname = SCRIPT_NAME } )
   local results = stdnse.output_table()
@@ -329,5 +345,10 @@ action = function(host, port)
     end
   end
   if #results > 0 then return results end
+  
+  --zl3 shut down luacov
+  luacov.shutdown()
+  print("zl3 luacov shut down")
+  --zl3 shut down luacov
 end
 
